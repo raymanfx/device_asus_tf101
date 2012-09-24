@@ -1,0 +1,47 @@
+<mixer>
+  <!-- These are the initial mixer settings -->
+  <ctl name="Speaker Switch" value="1" />
+  <ctl name="Int Mic Switch" value="0" />
+  <ctl name="Int Spk Switch" value="0" />
+  <ctl name="Headphone Jack Switch" value="0" />
+  <ctl name="Mic Jack Switch" value="0" />
+  <ctl name="Right Speaker Mixer DACR Switch" value="1"/>
+  <ctl name="Left Speaker Mixer DACL Switch" value="1"/>
+  <ctl name="HPF Switch" value="0"/>
+  <ctl name="Right ADC Input" value="ADC"/>
+  <ctl name="Left ADC Input" value="ADC"/>
+
+  <path name="speaker">
+    <ctl name="Int Spk Switch" value="1" />
+    <ctl name="Headphone Jack Switch" value="0" />
+  </path>
+
+  <path name="headphone">
+    <ctl name="Int Spk Switch" value="0" />
+    <ctl name="Headphone Jack Switch" value="1" />
+    <ctl name="Right Speaker Mixer DACR Switch" value="0"/>
+    <ctl name="Left Speaker Mixer DACL Switch" value="0"/>
+  </path>
+  
+  <path name="hdmi">
+    <ctl name="Speaker Switch" value="0" />
+  </path>
+
+  <path name="main-mic-top">
+    <ctl name="Int Mic Switch" value="1" />
+    <ctl name="HPF Switch" value="1"/>
+    <ctl name="Right ADC Input" value="DMIC"/>
+    <ctl name="Left ADC Input" value="DMIC"/>
+  </path>
+
+  <path name="main-mic-left">
+    <ctl name="Int Mic Switch" value="1" />
+    <ctl name="HPF Switch" value="1"/>
+    <ctl name="Right ADC Input" value="DMIC"/>
+    <ctl name="Left ADC Input" value="DMIC"/>
+  </path>
+
+  <path name="headset-mic">
+    <ctl name="Mic Jack Switch" value="1" />
+  </path>
+</mixer>
