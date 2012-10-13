@@ -89,15 +89,15 @@ BOARD_USES_GENERIC_AUDIO := false
 BOARD_USES_ALSA_AUDIO := false
 
 # Try to build the kernel
-# TARGET_KERNEL_CONFIG := cyanogen_tf101_defconfig
+TARGET_KERNEL_CONFIG := cyanogen_tf101_defconfig
 
-# Define the kernel source - not needed anymore
-# TARGET_KERNEL_SOURCE := kernel/asus/tf101
+# Define the kernel source
+TARGET_KERNEL_SOURCE := kernel/asus/tf101
 
 # Prebuilt Kernel Fallback
 TARGET_PREBUILT_KERNEL := device/asus/tf101/kernel
 
-# Coustom Tools
+# Custom Tools
 TARGET_RELEASETOOL_OTA_FROM_TARGET_SCRIPT := device/asus/tf101/releasetools/tf101_ota_from_target_files
 
 # Recovery Options
