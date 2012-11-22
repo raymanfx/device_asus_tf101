@@ -110,11 +110,6 @@
     <!-- Fix lid while sleeping -->
     <bool name="config_lidControlsSleep">true</bool>
 
-    <!-- If a dock provides a lid switch, that lid can be removed. This
-         setting is used to determine, whether lidOpenRotation has to be
-         applied. -->
-    <bool name="config_hasRemovableLid">true</bool>
-
     <!-- Touchpad inbound -->
     <!--bool name="config_hasTouchpad">true</bool -->
 
@@ -227,18 +222,15 @@
     <!-- The attenuation in dB applied to the lock/unlock sounds. -->
     <integer name="config_lockSoundVolumeDb">0</integer>
 
-    <!-- Path to the library that contains a device specific key handler -->
-    <string name="config_deviceKeyHandlerLib" translatable="false">/system/framework/com.cyanogenmod.asusec.jar</string>
+    <!-- Path to the library that contains a device specific key handler --- NEEDS TO BE IMPLEMENTED! -->
+    <!-- string name="config_deviceKeyHandlerLib" translatable="false">/system/framework/com.cyanogenmod.asusec.jar -->
 
     <!-- Name of that key handler class -->
-    <string name="config_deviceKeyHandlerClass" translatable="false">com.cyanogenmod.asusec.KeyHandler</string>
+    <!-- string name="config_deviceKeyHandlerClass" translatable="false">com.cyanogenmod.asusec.KeyHandler -->
 
     <!-- Boolean indicating whether the device has a dock battery -->
-    <bool name="config_hasDockBattery">true</bool>
+    <!-- bool name="config_hasDockBattery">true -->
 
     <!-- Package name providing network location support. -->
-    <string name="config_networkLocationProviderPackageName" translatable="false">com.google.android.location</string>
-
-    <!-- Package name providing geocoder API support. -->
-    <string name="config_geocodeProviderPackageName" translatable="false">com.google.android.location</string>
+    <!-- string name="config_locationProviderPackageNames" translatable="false">com.google.android.location -->
 </resources>
