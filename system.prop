@@ -1,3 +1,13 @@
+windowsmgr.max_events_per_sec=275
 #
 # system.prop for tf101
 #
+## cannot take spaces
+
+# Fields For VM Heapsize
+dalvik.vm.heapsize=384m
+dalvik.vm.heapstartsize=32m
+dalvik.vm.heapgrowthlimit=64m
+dalvik.vm.heaputilization=0.25
+dalvik.vm.heapidealfree=8388608
+dalvik.vm.heapconcurrentstart=2097152

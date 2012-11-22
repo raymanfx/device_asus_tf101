@@ -115,9 +115,6 @@
          applied. -->
     <bool name="config_hasRemovableLid">true</bool>
 
-    <!-- Invert the lid status to cope with ASUS crap needs -->
-    <!-- bool name="config_invertLidControl">true</bool -->
-
     <!-- Touchpad inbound -->
     <!--bool name="config_hasTouchpad">true</bool -->
 

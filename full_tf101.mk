@@ -1,4 +1,6 @@
-# Copyright (C) 2011 The Android Open Source Project
+#
+# Copyright (C) 2012 The CyanogenMod Project
+# Copyright (C) 2012 The LiquidSmooth Project
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -11,8 +13,9 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+#
 
-# Camera
+# camera
 PRODUCT_PACKAGES := \
 	HoloSpiralWallpaper \
 	LiveWallpapersPicker \
@@ -21,17 +24,17 @@ PRODUCT_PACKAGES := \
 PRODUCT_PACKAGES += \
     	Camera
 
-# Inherit full-base
+
+# device
+$(call inherit-product, device/asus/tf101/device.mk)
+
+# inherit
 $(call inherit-product, $(SRC_TARGET_DIR)/product/full_base.mk)
 
-# Inherit from toro device
-$(call inherit-product, device/asus/tf101/device_tf101.mk)
-
-# This is where we'd set a backup provider if we had one
-#$(call inherit-product, device/sample/products/backup_overlay.mk)
-
-# Set those variables here to overwrite the inherited values.
+# product
 PRODUCT_NAME := full_tf101
 PRODUCT_DEVICE := tf101
 PRODUCT_BRAND := asus
-PRODUCT_MODEL := Transformer
+PRODUCT_MANUFACTURER := Asus
+PRODUCT_MODEL := Transformer Pad
+
