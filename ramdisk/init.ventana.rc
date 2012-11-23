@@ -4,25 +4,36 @@ import init.ventana.keyboard.rc
 on early-init
     mount debugfs debugfs /sys/kernel/debug
 
-    export EXTERNAL_STORAGE /storage/sdcard0
-    export SECONDARY_STORAGE /storage/sdcard1
-    mkdir /storage 0050 system sdcard_r
-    mkdir /storage/sdcard0 0000 system system
-    symlink /storage/sdcard0 /sdcard
-    symlink /storage/sdcard0 /mnt/sdcard
+    mkdir /mnt/shell/emulated 0700 shell shell
+    mkdir /storage/emulated 0555 root root
+
+    export EXTERNAL_STORAGE /storage/emulated/legacy
+    export EMULATED_STORAGE_SOURCE /mnt/shell/emulated
+    export EMULATED_STORAGE_TARGET /storage/emulated
+
+    # Legacy support
+    symlink /storage/emulated/legacy /sdcard
+    symlink /storage/emulated/legacy /mnt/sdcard
+    symlink /storage/emulated/legacy /storage/sdcard0
+    symlink /mnt/shell/emulated/0 /storage/emulated/legacy
 
     # make the pathes for the external media mounts
-    mkdir /storage/sdcard1 0000 system system
-    mkdir /storage/sdcard2 0000 system system
-    mkdir /storage/usbdisk0 0000 system system
-    mkdir /storage/usbdisk1 0000 system system
+    # mkdir /storage/sdcard1 0000 system system
+    # mkdir /storage/sdcard2 0000 system system
+    # mkdir /storage/usbdisk0 0000 system system
+    # mkdir /storage/usbdisk1 0000 system system
 
 on fs
     setprop ro.crypto.tmpfs_options size=128m,mode=0771,uid=1000,gid=1000
     setprop ro.crypto.umount_sd false
     mount_all /fstab.ventana
 
+    # virtual sdcard daemon running as media_rw (1023)
+    service sdcard /system/bin/sdcard /data/media /mnt/shell/emulated 1023 1023
+	class late_start
+
 on post-fs-data
+    mkdir /data/media 0770 media_rw media_rw
     mkdir /data/misc/wifi 0770 wifi wifi
     mkdir /data/misc/wifi/sockets 0770 wifi wifi
     mkdir /data/misc/dhcp 0770 dhcp dhcp
@@ -31,7 +42,6 @@ on post-fs-data
     mkdir /data/misc/wminput 0776 system system
 
     # we will remap this as /mnt/sdcard with the sdcard fuse tool
-    mkdir /data/media 0775 media_rw media_rw
     chown media_rw media_rw /data/media
 
     # Set indication (checked by vold) that we have finished this action
