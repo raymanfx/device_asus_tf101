@@ -1,4 +1,4 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd"><html><head><title>audio/audio_hw.c - device/asus/grouper - Git at Google</title><link rel="stylesheet" type="text/css" href="//www.google.com/css/go.css" /><link rel="stylesheet" type="text/css" href="/+static/prettify/prettify.vf-M93Ay4IiiWRQSJKPGWQ.cache.css" /><link rel="stylesheet" type="text/css" href="/+static/gitiles.76iNvupRwElh_9ac4itPQg.cache.css" /><script src="/+static/prettify/prettify_compiled.tBfOdWkOBM1HHwscnUdTAA.cache.js" type="text/javascript"></script></head><body onload="prettyPrint()"><h1><img src="//www.google.com/images/logo_sm.gif" alt="Google" />Git</h1><div class="menu"> <a href="https://www.google.com/accounts/ServiceLogin?service=gerritcodereview&amp;continue=https://android.googlesource.com/login/device/asus/grouper/%2B/c384f5f2ac0c60106a93b45c30ff4137131f2d39/audio/audio_hw.c">Sign in</a> </div><div class="breadcrumbs"><a href="/?format=HTML">android</a> / <a href="/device/asus/grouper/">device/asus/grouper</a> / <a href="/device/asus/grouper/+/c384f5f2ac0c60106a93b45c30ff4137131f2d39">c384f5f2ac0c60106a93b45c30ff4137131f2d39</a> / <a href="/device/asus/grouper/+/c384f5f2ac0c60106a93b45c30ff4137131f2d39/">.</a> / <a href="/device/asus/grouper/+/c384f5f2ac0c60106a93b45c30ff4137131f2d39/audio">audio</a> / audio_hw.c</div><div class="sha1">blob: 5a9cbf6b7880d4bb9175decc0cbd9e11ac291de9 [<a href="/device/asus/grouper/+log/c384f5f2ac0c60106a93b45c30ff4137131f2d39/audio/audio_hw.c">file history</a>]</div><pre class="git-blob prettyprint linenums lang-c">/*
+/*
  * Copyright (C) 2012 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
@@ -1272,4 +1272,3 @@ struct audio_module HAL_MODULE_INFO_SYM = {
         .methods = &amp;hal_module_methods,
     },
 };
-</pre></body></html>
