@@ -100,7 +100,7 @@ OPTIONS.extra_script = None
 OPTIONS.aslr_mode = True
 OPTIONS.worker_threads = 3
 OPTIONS.backuptool = False
-#OPTIONS.modelidcfg = True
+OPTIONS.modelidcfg = True
 OPTIONS.override_device = 'auto'
 
 LOCAL_DIR = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..'))
@@ -399,53 +399,57 @@ def WriteFullOTAPackage(input_zip, output_zip):
       metadata=metadata,
       info_dict=OPTIONS.info_dict)
 
-  #if not OPTIONS.omit_prereq:
-  #  ts = GetBuildProp("ro.build.date.utc", input_zip)
-  #  script.AssertOlderBuild(ts)
-
   AppendAssertions(script, input_zip)
   device_specific.FullOTA_Assertions()
-  if OPTIONS.backuptool:
-    script.RunBackup("backup")
+  device_specific.FullOTA_InstallBegin()
 
   script.ShowProgress(0.5, 0)
 
   if OPTIONS.wipe_user_data:
     script.FormatPartition("/data")
 
-  script.FormatPartition("/system")
-  script.Mount("/system")
-  #script.UnpackPackageDir("recovery", "/system")
-  script.UnpackPackageDir("system", "/system")
+  script.Print("=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-")
+  script.Print("     \ )        (          )\ ) )\ )           ")
+  script.Print("     (()/  (   ( )\     (  (()/((()/(          ")
+  script.Print("     (_)) ((_) (_)_)   /((_)(_)) (_))          ")
+  script.Print("     | |   (_) / _ \ (_))( |_ _| |   \         ")
+  script.Print("     | |__ | || (_) || || | | |  | |) |        ")
+  script.Print("     |____||_| \__\_\ \_,_||___| |___/         ")
+  script.Print("   __/\__ __/\__  __/\__  __/\__  __/\__      ")
+  script.Print("   \    / \    /  \    /  \    /  \    /      ")
+  script.Print("   /_  _\ /_  _\  /_  _\  /_  _\  /_  _\      ")
+  script.Print("     \/     \/      \/      \/      \/        ")
+  script.Print("=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-")
+  script.Print("         <%%% Liquid-Jelly Bean %%%>          ")
+  script.Print("           <%%% By TeamLiquid %%%>            ")
+  script.Print("=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-")
+  script.Print("Erasing System...")
 
+
+  script.FormatPartition("/system")
+  script.Print("Mounting System...")
+  script.Mount("/system")
+  script.ShowProgress(0.5, 40)
+  script.Print("Installing System...")
+  script.UnpackPackageDir("system", "/system")
+  script.Print("Creating Symlinks...") 
   (symlinks, retouch_files) = CopySystemFiles(input_zip, output_zip)
   script.MakeSymlinks(symlinks)
 
   prebuilt_path = os.path.join(DEV_OUT_DIR, "boot.img")
-
   blob = common.File.FromLocalFile("boot.img", prebuilt_path)
-
-  #recovery_img = common.GetBootableImage("recovery.img", "recovery.img",
-  #                                       OPTIONS.input_tmp, "RECOVERY")
-  #MakeRecoveryPatch(output_zip, recovery_img, boot_img)
 
   Item.GetMetadata(input_zip)
   Item.Get("system").SetPermissions(script)
-
+  script.SetPermissionsRecursive("/system/etc/init.d", 0, 0, 0755, 0555)
   common.ZipWriteStr(output_zip, "boot.blob", blob.data)
   script.ShowProgress(0.2, 0)
-
-  if OPTIONS.backuptool:
-    script.ShowProgress(0.2, 10)
-    script.RunBackup("restore")
-
-#  if OPTIONS.modelidcfg:
-#    script.RunConfig("")
 
   script.ShowProgress(0.2, 10)
   script.WriteRawImage("/staging", "boot.blob")
 
   script.ShowProgress(0.1, 0)
+  script.Print("Installation Completed!")
   device_specific.FullOTA_InstallEnd()
 
   if OPTIONS.extra_script is not None:
@@ -733,6 +737,10 @@ def WriteIncrementalOTAPackage(target_zip, source_zip, output_zip):
       to_create.append((dest, link))
   script.DeleteFiles([i[1] for i in to_create])
   script.MakeSymlinks(to_create)
+  if OPTIONS.aslr_mode:
+    script.RetouchBinaries(target_retouch_files)
+  else:
+    script.UndoRetouchBinaries(target_retouch_files)
 
   # Now that the symlinks are created, we can set all the
   # permissions.
@@ -781,8 +789,8 @@ def main(argv):
       OPTIONS.worker_threads = int(a)
     elif o in ("--backup"):
       OPTIONS.backuptool = bool(a.lower() == 'true')
-#    elif o in ("--configid"):
-#      OPTIONS.modelidcfg = bool(a.lower() == 'true')
+    elif o in ("--configid"):
+      OPTIONS.modelidcfg = bool(a.lower() == 'true')
     elif o in ("--override_device"):
       OPTIONS.override_device = a
     else:
