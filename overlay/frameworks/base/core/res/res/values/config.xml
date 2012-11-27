@@ -95,11 +95,15 @@
          Software implementation will be used if config_hardware_auto_brightness_available is not set -->
     <bool name="config_automatic_brightness_available">true</bool>
 
-    <!-- If this is true, the screen will fade off. -->
-    <!-- bool name="config_animateScreenLights">true</bool -->
+    <!-- Enable lockscreen rotation -->
+    <bool name="config_enableLockScreenRotation">true</bool>
+
+    <!-- If true, the screen can be rotated via the accelerometer in all 4
+         rotations as the default behavior. -->
+    <bool name="config_allowAllRotations">true</bool>
 
     <!-- The number of degrees to rotate the display when the keyboard is open. -->
-    <integer name="config_lidOpenRotation">0</integer>
+    <!-- <integer name="config_lidOpenRotation">0</integer> -->
 
     <!-- Fix the screen_off profile while lid is closed (0=false, 1=true while lid open, 2=always true)-->
     <integer name="config_lidKeyboardAccessibility">1</integer>
@@ -221,4 +225,7 @@
 
     <!-- The attenuation in dB applied to the lock/unlock sounds. -->
     <integer name="config_lockSoundVolumeDb">0</integer>
+
+    <!--  Maximum number of supported users -->
+    <integer name="config_multiuserMaximumUsers">8</integer>
 </resources>
