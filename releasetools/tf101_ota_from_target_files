@@ -413,6 +413,13 @@ def WriteFullOTAPackage(input_zip, output_zip):
   if OPTIONS.wipe_user_data:
     script.FormatPartition("/data")
 
+  common.ZipWriteStr(output_zip, "boot.blob", blob.data)
+  script.ShowProgress(0.2, 0)
+
+  script.ShowProgress(0.2, 10)
+  script.WriteRawImage("/staging", "boot.blob")
+
+
   script.FormatPartition("/system")
   script.Mount("/system")
   #script.UnpackPackageDir("recovery", "/system")
@@ -432,18 +439,12 @@ def WriteFullOTAPackage(input_zip, output_zip):
   Item.GetMetadata(input_zip)
   Item.Get("system").SetPermissions(script)
 
-  common.ZipWriteStr(output_zip, "boot.blob", blob.data)
-  script.ShowProgress(0.2, 0)
-
   if OPTIONS.backuptool:
     script.ShowProgress(0.2, 10)
     script.RunBackup("restore")
 
   #if OPTIONS.modelidcfg:
   # script.RunConfig("")
-
-  script.ShowProgress(0.2, 10)
-  script.WriteRawImage("/staging", "boot.blob")
 
   script.ShowProgress(0.1, 0)
   device_specific.FullOTA_InstallEnd()
