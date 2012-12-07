@@ -53,9 +53,6 @@ BOARD_SYSTEMIMAGE_PARTITION_SIZE := 527433728
 BOARD_USERDATAIMAGE_PARTITION_SIZE := 29850022707
 BOARD_FLASH_BLOCK_SIZE := 4096
 
-# Prebuilt Kernel Fallback
-TARGET_PREBUILT_KERNEL := device/asus/tf101/recovery/kernel
-
 # Recovery Options
 BOARD_CUSTOM_BOOTIMG_MK := device/asus/tf101/recovery/recovery.mk
 TARGET_RECOVERY_INITRC := device/asus/tf101/recovery/init.rc

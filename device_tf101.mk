@@ -14,16 +14,9 @@
 
 $(call inherit-product, $(SRC_TARGET_DIR)/product/languages_full.mk)
 
-# Prebuilt kernel location
-ifeq ($(TARGET_PREBUILT_KERNEL),)
-	LOCAL_KERNEL := $(LOCAL_PATH)/kernel
-else
-	LOCAL_KERNEL := $(TARGET_PREBUILT_KERNEL)
-endif
-
 # Files needed for boot image
 PRODUCT_COPY_FILES += \
-    $(LOCAL_KERNEL):kernel \
+    $(LOCAL_PATH)/recovery/kernel:kernel \
     $(LOCAL_PATH)/ramdisk/init.ventana.rc:root/init.ventana.rc\
     $(LOCAL_PATH)/ramdisk/init.ventana.usb.rc:root/init.ventana.usb.rc \
     $(LOCAL_PATH)/ramdisk/ueventd.ventana.rc:root/ueventd.ventana.rc \
