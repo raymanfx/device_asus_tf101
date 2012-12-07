@@ -80,4 +80,3 @@ BOARD_CACHE_FILESYSTEM := ext4
 
 # More recovery flags
 TARGET_RECOVERY_PRE_COMMAND := "echo 'boot-recovery' > /dev/block/mmcblk0p3; sync"
-BOARD_CUSTOM_RECOVERY_KEYMAPPING := ../../device/asus/tf101/recovery_ui.c
