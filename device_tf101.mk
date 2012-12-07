@@ -28,7 +28,6 @@ PRODUCT_COPY_FILES += \
     $(LOCAL_PATH)/ramdisk/init.ventana.usb.rc:root/init.ventana.usb.rc \
     $(LOCAL_PATH)/ramdisk/ueventd.ventana.rc:root/ueventd.ventana.rc \
     $(LOCAL_PATH)/ramdisk/init.ventana.keyboard.rc:root/init.ventana.keyboard.rc \
-    $(LOCAL_PATH)/prebuilt/keyswap::root/sbin/keyswap \
     $(LOCAL_PATH)/ramdisk/fstab.ventana:root/fstab.ventana
 
 # These are the hardware-specific features
