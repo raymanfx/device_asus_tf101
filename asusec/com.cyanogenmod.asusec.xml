@@ -1,5 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<permissions>
-    <library name="com.cyanogenmod.asusdec"
-            file="/system/framework/com.cyanogenmod.asusec.jar"/>
-</permissions>

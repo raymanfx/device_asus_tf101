@@ -1,8 +1,0 @@
-[
- {
-   "repository": "android_kernel_asus_tf101",
-   "target_path": "kernel/asus/tf101",
-   "branch": "9.2.1.17"
- }
-]
-
