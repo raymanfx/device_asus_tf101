@@ -38,7 +38,7 @@ void device_ui_init(UIParameters* ui_parameters) {
 
 int device_recovery_start() {
     return 0;
-}s
+}
 
 int device_reboot_now(volatile char* key_pressed, int key_code) {
     return 0;
@@ -63,7 +63,6 @@ int device_handle_key(int key_code, int visible) {
             case KEY_LEFTBRACE:
             case KEY_ENTER:
             case BTN_MOUSE:
-            case KEY_CENTER:
             case KEY_CAMERA:
             case KEY_F21:
             case KEY_SEND:
