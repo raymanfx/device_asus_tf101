@@ -104,6 +104,15 @@ PRODUCT_COPY_FILES += \
     $(LOCAL_PATH)/prebuilt/etc/nvram_murata.txt:system/etc/nvram_murata.txt \
     $(LOCAL_PATH)/prebuilt/etc/nvram_nh615_sl101.txt:system/etc/nvram_nh615_sl101.txt
 
+# bluetooth
+PRODUCT_COPY_FILES += \
+    $(LOCAL_PATH)/bluetooth/bt_vendor.conf:system/etc/bluetooth/bt_vendor.conf \
+    $(LOCAL_PATH)/../../../system/bluetooth/data/main.nonsmartphone.conf:system/etc/bluetooth/main.conf
+
+# camera
+PRODUCT_COPY_FILES += \
+    $(LOCAL_PATH)/prebuilt/etc/nvcamera.conf:system/etc/nvcamera.conf
+
 # modules
 PRODUCT_COPY_FILES += \
     $(LOCAL_PATH)/prebuilt/lib/modules/battery_rvsd.ko:system/lib/modules/battery_rvsd.ko \
