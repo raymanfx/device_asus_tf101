@@ -143,10 +143,27 @@ def LoadInfoDict(zip):
   makeint("blocksize")
   makeint("system_size")
   makeint("userdata_size")
+  makeint("cache_size")
   makeint("recovery_size")
   makeint("boot_size")
 
   d["fstab"] = LoadRecoveryFSTab(zip)
+  d["build.prop"] = LoadBuildProp(zip)
+  return d
+
+def LoadBuildProp(zip):
+  try:
+    data = zip.read("SYSTEM/build.prop")
+  except KeyError:
+    print "Warning: could not find SYSTEM/build.prop in %s" % zip
+    data = ""
+
+  d = {}
+  for line in data.split("\n"):
+    line = line.strip()
+    if not line or line.startswith("#"): continue
+    name, value = line.split("=", 1)
+    d[name] = value
   return d
 
 def LoadRecoveryFSTab(zip):
@@ -164,7 +181,7 @@ def LoadRecoveryFSTab(zip):
     line = line.strip()
     if not line or line.startswith("#"): continue
     pieces = line.split()
-    if not (3 <= len(pieces) <= 7):
+    if not (3 <= len(pieces) <= 4):
       raise ValueError("malformed recovery.fstab line: \"%s\"" % (line,))
 
     p = Partition()
@@ -173,7 +190,7 @@ def LoadRecoveryFSTab(zip):
     p.device = pieces[2]
     p.length = 0
     options = None
-    if len(pieces) >= 4 and pieces[3] != 'NULL':
+    if len(pieces) >= 4:
       if pieces[3].startswith("/"):
         p.device2 = pieces[3]
         if len(pieces) >= 5:
@@ -200,7 +217,7 @@ def DumpInfoDict(d):
   for k, v in sorted(d.items()):
     print "%-25s = (%s) %s" % (k, type(v).__name__, v)
 
-def BuildBootableImage(sourcedir):
+def BuildBootableImage(sourcedir, fs_config_file, info_dict=None):
   """Take a kernel, cmdline, and ramdisk directory from the input (in
   'sourcedir'), and turn them into a boot image.  Return the image
   data, or None if sourcedir does not appear to contains files for
@@ -210,11 +227,17 @@ def BuildBootableImage(sourcedir):
       not os.access(os.path.join(sourcedir, "kernel"), os.F_OK)):
     return None
 
+  if info_dict is None:
+    info_dict = OPTIONS.info_dict
+
   ramdisk_img = tempfile.NamedTemporaryFile()
   img = tempfile.NamedTemporaryFile()
 
-  p1 = Run(["mkbootfs", os.path.join(sourcedir, "RAMDISK")],
-           stdout=subprocess.PIPE)
+  if os.access(fs_config_file, os.F_OK):
+    cmd = ["mkbootfs", "-f", fs_config_file, os.path.join(sourcedir, "RAMDISK")]
+  else:
+    cmd = ["mkbootfs", os.path.join(sourcedir, "RAMDISK")]
+  p1 = Run(cmd, stdout=subprocess.PIPE)
   p2 = Run(["minigzip"],
            stdin=p1.stdout, stdout=ramdisk_img.file.fileno())
 
@@ -223,41 +246,29 @@ def BuildBootableImage(sourcedir):
   assert p1.returncode == 0, "mkbootfs of %s ramdisk failed" % (targetname,)
   assert p2.returncode == 0, "minigzip of %s ramdisk failed" % (targetname,)
 
-  """check if uboot is requested"""
-  fn = os.path.join(sourcedir, "ubootargs")
+  cmd = ["mkbootimg", "--kernel", os.path.join(sourcedir, "kernel")]
+
+  fn = os.path.join(sourcedir, "cmdline")
   if os.access(fn, os.F_OK):
-    cmd = ["mkimage"]
-    for argument in open(fn).read().rstrip("\n").split(" "):
-      cmd.append(argument)
-    cmd.append("-d")
-    cmd.append(os.path.join(sourcedir, "kernel")+":"+ramdisk_img.name)
-    cmd.append(img.name)
+    cmd.append("--cmdline")
+    cmd.append(open(fn).read().rstrip("\n"))
 
-  else:
-    cmd = ["mkbootimg", "--kernel", os.path.join(sourcedir, "kernel")]
+  fn = os.path.join(sourcedir, "base")
+  if os.access(fn, os.F_OK):
+    cmd.append("--base")
+    cmd.append(open(fn).read().rstrip("\n"))
 
-    fn = os.path.join(sourcedir, "cmdline")
-    if os.access(fn, os.F_OK):
-      cmd.append("--cmdline")
-      cmd.append(open(fn).read().rstrip("\n"))
+  fn = os.path.join(sourcedir, "pagesize")
+  if os.access(fn, os.F_OK):
+    cmd.append("--pagesize")
+    cmd.append(open(fn).read().rstrip("\n"))
 
-    fn = os.path.join(sourcedir, "base")
-    if os.access(fn, os.F_OK):
-      cmd.append("--base")
-      cmd.append(open(fn).read().rstrip("\n"))
+  args = info_dict.get("mkbootimg_args", None)
+  if args and args.strip():
+    cmd.extend(args.split())
 
-    fn = os.path.join(sourcedir, "pagesize")
-    if os.access(fn, os.F_OK):
-      cmd.append("--pagesize")
-      cmd.append(open(fn).read().rstrip("\n"))
-
-    fn = os.path.join(sourcedir, "ramdiskaddr")
-    if os.access(fn, os.F_OK):
-      cmd.append("--ramdiskaddr")
-      cmd.append(open(fn).read().rstrip("\n"))
-
-    cmd.extend(["--ramdisk", ramdisk_img.name,
-                "--output", img.name])
+  cmd.extend(["--ramdisk", ramdisk_img.name,
+              "--output", img.name])
 
   p = Run(cmd, stdout=subprocess.PIPE)
   p.communicate()
@@ -273,7 +284,8 @@ def BuildBootableImage(sourcedir):
   return data
 
 
-def GetBootableImage(name, prebuilt_name, unpack_dir, tree_subdir):
+def GetBootableImage(name, prebuilt_name, unpack_dir, tree_subdir,
+                     info_dict=None):
   """Return a File object (with name 'name') with the desired bootable
   image.  Look for it in 'unpack_dir'/BOOTABLE_IMAGES under the name
   'prebuilt_name', otherwise construct it from the source files in
@@ -285,7 +297,10 @@ def GetBootableImage(name, prebuilt_name, unpack_dir, tree_subdir):
     return File.FromLocalFile(name, prebuilt_path)
   else:
     print "building image from target_files %s..." % (tree_subdir,)
-    return File(name, BuildBootableImage(os.path.join(unpack_dir, tree_subdir)))
+    fs_config = "META/" + tree_subdir.lower() + "_filesystem_config.txt"
+    return File(name, BuildBootableImage(os.path.join(unpack_dir, tree_subdir),
+                                         os.path.join(unpack_dir, fs_config),
+                                         info_dict))
 
 
 def UnzipTemp(filename, pattern=None):
@@ -376,14 +391,8 @@ def SignFile(input_name, output_name, key, password, align=None,
   else:
     sign_name = output_name
 
-  check = (sys.maxsize > 2**32)
-  if check is True:
-    cmd = ["java", "-Xmx2048m", "-jar",
+  cmd = ["java", "-Xmx2048m", "-jar",
            os.path.join(OPTIONS.search_path, "framework", "signapk.jar")]
-  else:
-    cmd = ["java", "-Xmx1024m", "-jar",
-           os.path.join(OPTIONS.search_path, "framework", "signapk.jar")]
-
   if whole_file:
     cmd.append("-w")
   cmd.extend([key + ".x509.pem", key + ".pk8",
@@ -416,24 +425,27 @@ def CheckSize(data, target, info_dict):
     if mount_point == "/userdata": mount_point = "/data"
     p = info_dict["fstab"][mount_point]
     fs_type = p.fs_type
-    limit = info_dict.get(p.device + "_size", None)
+    device = p.device
+    if "/" in device:
+      device = device[device.rfind("/")+1:]
+    limit = info_dict.get(device + "_size", None)
   if not fs_type or not limit: return
 
   if fs_type == "yaffs2":
     # image size should be increased by 1/64th to account for the
     # spare area (64 bytes per 2k page)
     limit = limit / 2048 * (2048+64)
-    size = len(data)
-    pct = float(size) * 100.0 / limit
-    msg = "%s size (%d) is %.2f%% of limit (%d)" % (target, size, pct, limit)
-    if pct >= 99.0:
-      raise ExternalError(msg)
-    elif pct >= 95.0:
-      print
-      print "  WARNING: ", msg
-      print
-    elif OPTIONS.verbose:
-      print "  ", msg
+  size = len(data)
+  pct = float(size) * 100.0 / limit
+  msg = "%s size (%d) is %.2f%% of limit (%d)" % (target, size, pct, limit)
+  if pct >= 99.0:
+    raise ExternalError(msg)
+  elif pct >= 95.0:
+    print
+    print "  WARNING: ", msg
+    print
+  elif OPTIONS.verbose:
+    print "  ", msg
 
 
 def ReadApkCerts(tf_zip):
@@ -686,6 +698,10 @@ class DeviceSpecificParams(object):
     assertions they like."""
     return self._DoCall("FullOTA_Assertions")
 
+  def FullOTA_InstallBegin(self):
+    """Called at the start of full OTA installation."""
+    return self._DoCall("FullOTA_InstallBegin")
+
   def FullOTA_InstallEnd(self):
     """Called at the end of full OTA installation; typically this is
     used to install the image for the device's baseband processor."""
@@ -697,11 +713,22 @@ class DeviceSpecificParams(object):
     additional assertions they like."""
     return self._DoCall("IncrementalOTA_Assertions")
 
+  def IncrementalOTA_VerifyBegin(self):
+    """Called at the start of the verification phase of incremental
+    OTA installation; additional checks can be placed here to abort
+    the script before any changes are made."""
+    return self._DoCall("IncrementalOTA_VerifyBegin")
+
   def IncrementalOTA_VerifyEnd(self):
     """Called at the end of the verification phase of incremental OTA
     installation; additional checks can be placed here to abort the
     script before any changes are made."""
     return self._DoCall("IncrementalOTA_VerifyEnd")
+
+  def IncrementalOTA_InstallBegin(self):
+    """Called at the start of incremental OTA installation (after
+    verification is complete)."""
+    return self._DoCall("IncrementalOTA_InstallBegin")
 
   def IncrementalOTA_InstallEnd(self):
     """Called at the end of incremental OTA installation; typically
@@ -741,10 +768,11 @@ DIFF_PROGRAM_BY_EXT = {
     }
 
 class Difference(object):
-  def __init__(self, tf, sf):
+  def __init__(self, tf, sf, diff_program=None):
     self.tf = tf
     self.sf = sf
     self.patch = None
+    self.diff_program = diff_program
 
   def ComputePatch(self):
     """Compute the patch (as a string of data) needed to turn sf into
@@ -753,8 +781,11 @@ class Difference(object):
     tf = self.tf
     sf = self.sf
 
-    ext = os.path.splitext(tf.name)[1]
-    diff_program = DIFF_PROGRAM_BY_EXT.get(ext, "bsdiff")
+    if self.diff_program:
+      diff_program = self.diff_program
+    else:
+      ext = os.path.splitext(tf.name)[1]
+      diff_program = DIFF_PROGRAM_BY_EXT.get(ext, "bsdiff")
 
     ttemp = tf.WriteToTemp()
     stemp = sf.WriteToTemp()
@@ -839,13 +870,9 @@ def ComputeDifferences(diffs):
 
 
 # map recovery.fstab's fs_types to mount/format "partition types"
-PARTITION_TYPES = { "ext2": "EMMC",
-                    "ext3": "EMMC",
-                    "ext4": "EMMC",
-                    "emmc": "EMMC",
-                    "mtd": "MTD",
-                    "yaffs2": "MTD",
-                    "vfat": "EMMC" }
+PARTITION_TYPES = { "yaffs2": "MTD", "mtd": "MTD",
+                    "ext3": "EMMC", "emmc": "EMMC",
+		    "ext4": "EMMC", "emmc": "EMMC" }
 
 def GetTypeAndDevice(mount_point, info):
   fstab = info["fstab"]
