@@ -65,8 +65,7 @@ PRODUCT_COPY_FILES += \
     $(LOCAL_PATH)/ramdisk/fstab.ventana:root/fstab.ventana \
     $(LOCAL_PATH)/ramdisk/init.ventana.rc:root/init.ventana.rc \
     $(LOCAL_PATH)/ramdisk/ueventd.ventana.rc:root/ueventd.ventana.rc \
-    $(LOCAL_PATH)/ramdisk/init.ventana.usb.rc:root/init.ventana.usb.rc \
-    $(LOCAL_PATH)/ramdisk/init.ventana.keyboard.rc:root/init.ventana.keyboard.rc
+    $(LOCAL_PATH)/ramdisk/init.ventana.usb.rc:root/init.ventana.usb.rc
 
 # keychars
 PRODUCT_COPY_FILES += \
