@@ -107,3 +107,6 @@ TARGET_RELEASETOOL_OTA_FROM_TARGET_SCRIPT := device/asus/tf101/releasetools/tf10
 
 # recovery hack
 TARGET_RECOVERY_PRE_COMMAND := "echo 'boot-recovery' > /dev/block/mmcblk0p3; sync"
+
+# old Tegra2 EGL support
+BOARD_EGL_NEEDS_LEGACY_FB := true
