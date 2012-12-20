@@ -14,8 +14,6 @@
 # limitations under the License.
 #
 
-USE_CAMERA_STUB := false
-
 # assert
 TARGET_OTA_ASSERT_DEVICE := tf101
 
@@ -76,6 +74,7 @@ BOARD_HAVE_BLUETOOTH_BCM := true
 BOARD_BLUETOOTH_BDROID_BUILDCFG_INCLUDE_DIR := device/asus/tf101/bluetooth
 
 # camera
+USE_CAMERA_STUB := false
 COMMON_GLOBAL_CFLAGS += -DICS_CAMERA_BLOB
 
 # display
